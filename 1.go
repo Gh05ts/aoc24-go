@@ -10,9 +10,9 @@ import (
 )
 
 func main() {
-	file, err := os.Open("inputs/1.txt")
+	file, err := os.Open("inputs/2.txt")
 	if err != nil {
-		fmt.Println("Bad file")
+		fmt.Println(fmt.Errorf("open failed: %w", err).Error())
 		return
 	}
 	defer file.Close()
@@ -58,7 +58,7 @@ func absIntDiff(a, b int) int {
 func atoiWrap(number string) int {
 	num, err := strconv.Atoi(number)
 	if err != nil {
-		fmt.Errorf("atoi failed: %w", err)
+		fmt.Println(fmt.Errorf("atoi failed: %w", err).Error())
 	}
 	return num
 }
