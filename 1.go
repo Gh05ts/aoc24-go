@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"math"
 	"os"
 	"sort"
 	"strconv"
@@ -51,8 +50,15 @@ func main() {
 
 	result := 0
 	for i := range list1 {
-		result += int(math.Abs(float64(list1[i]) - float64(list2[i])))
+		result += absIntDiff(list1[i], list2[i])
 	}
 
 	fmt.Println(result)
+}
+
+func absIntDiff(a, b int) int {
+	if a > b {
+		return a - b
+	}
+	return b - a
 }
