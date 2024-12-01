@@ -29,8 +29,8 @@ func main() {
 		}
 
 		line = strings.TrimSpace(line)
-		
 		numbers := strings.Fields(line)
+
 		num1, err := strconv.Atoi(numbers[0])
 		if err != nil {
 			fmt.Println("can't convert")
@@ -50,7 +50,6 @@ func main() {
 	sort.Ints(list2)
 
 	result := 0
-
 	for i := range list1 {
 		result += int(math.Abs(float64(list1[i]) - float64(list2[i])))
 	}
