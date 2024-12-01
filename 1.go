@@ -60,7 +60,7 @@ func fileReader(path string) *bufioCloser {
 // read lines and get fields and append to 2 lists
 // first list corresponds to first column's values
 // second list corresponds to second column's values
-// conver to numbers from strings for math operations
+// convert to numbers from strings for math operations
 func ioColumns(reader *bufioCloser) (column1, column2 []int) {
 	var col1, col2 []int
 	for {
