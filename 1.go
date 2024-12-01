@@ -30,18 +30,10 @@ func main() {
 		line = strings.TrimSpace(line)
 		numbers := strings.Fields(line)
 
-		num1, err := strconv.Atoi(numbers[0])
-		if err != nil {
-			fmt.Println("can't convert")
-			continue
-		}
+		num1 := atoiWrap(numbers[0])
 		list1 = append(list1, num1)
 
-		num2, err := strconv.Atoi(numbers[1])
-		if err != nil {
-			fmt.Println("can't convert")
-			continue
-		}
+		num2 := atoiWrap(numbers[1])
 		list2 = append(list2, num2)
 	}
 
@@ -61,4 +53,12 @@ func absIntDiff(a, b int) int {
 		return a - b
 	}
 	return b - a
+}
+
+func atoiWrap(number string) int {
+	num, err := strconv.Atoi(number)
+	if err != nil {
+		fmt.Errorf("atoi failed: %w", err)
+	}
+	return num
 }
