@@ -3,11 +3,11 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"os"
-	"strings"
-	"strconv"
-	"sort"
 	"math"
+	"os"
+	"sort"
+	"strconv"
+	"strings"
 )
 
 func main() {
