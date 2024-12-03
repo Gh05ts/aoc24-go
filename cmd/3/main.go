@@ -26,7 +26,7 @@ func main() {
 	args := os.Args
 
 	if len(args) < 2 {
-		return
+		args = append(args, "v1")
 	}
 
 	content, err := os.ReadFile("inputs/3.txt")
@@ -60,7 +60,7 @@ func main() {
 		mul := 0
 		start := match[0]
 		end := match[1]
-		allowFlag = check(&doIdx, &dontIdx, start, doIndices, dontIndices) || strings.Compare(args[1], "stage") != 0
+		allowFlag = strings.Compare(args[1], "v2") != 0 || check(&doIdx, &dontIdx, start, doIndices, dontIndices)
 		for _, num := range reg.FindAllString(strContent[start:end], -1) {
 			if allowFlag {
 				if mul == 0 {

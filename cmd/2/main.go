@@ -18,7 +18,7 @@ func main() {
 	args := os.Args
 
 	if len(args) < 2 {
-		return
+		args = append(args, "v1")
 	}
 
 	reader := fileReader("inputs/2.txt")
@@ -80,7 +80,7 @@ func canBeSortedByRemovingOneAscending(arr []string, strict string) bool {
 		return true
 	}
 	// Check by removing arr[index] or arr[index+1]
-	return ((index == 0 || arr[index-1] <= arr[index+1]) || (index+1 == len(arr)-1 || arr[index] <= arr[index+2])) && strings.Compare(strict, "strict") != 0
+	return ((index == 0 || arr[index-1] <= arr[index+1]) || (index+1 == len(arr)-1 || arr[index] <= arr[index+2])) && strings.Compare(strict, "v2") == 0
 }
 
 func canBeSortedByRemovingOneDescending(arr []string, strict string) bool {

@@ -34,7 +34,7 @@ func main() {
 	args := os.Args
 
 	if len(args) < 2 {
-		return
+		args = append(args, "v1")
 	}
 
 	stage := args[1]
@@ -44,7 +44,7 @@ func main() {
 	column1, column2 := ioColumns(reader)
 
 	result := 0
-	if stage == "1" {
+	if stage != "v2" {
 		sort.Ints(column1)
 		sort.Ints(column2)
 		for i := range column1 {
