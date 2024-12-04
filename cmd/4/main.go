@@ -9,7 +9,8 @@ import (
 )
 
 const (
-	searchWord = "XMAS"
+	searchWord  = "XMAS"
+	searchWord2 = "MAS"
 )
 
 type bufioCloser struct {
@@ -28,7 +29,7 @@ func main() {
 	defer reader.Close()
 
 	lines := ioConvert(reader)
-	count := XmasCounter(lines)
+	count := XmasCounter(lines, args[1])
 	fmt.Println(count)
 }
 
@@ -55,13 +56,15 @@ func ioConvert(reader *bufioCloser) [][]rune {
 	return lines
 }
 
-func XmasCounter(lines [][]rune) int {
-	positions := findAllOccurences(lines, searchWord)
-	if len(positions) > 0 {
-		fmt.Println("Word found!")
+func XmasCounter(lines [][]rune, stage string) int {
+	var word string
+	if strings.Compare(stage, "v2") != 0 {
+		fmt.Println("No Peeking")
+		word = searchWord
 	} else {
-		fmt.Println("Word not found.")
+		word = searchWord2
 	}
+	positions := findAllOccurences(lines, word)
 	return len(positions)
 }
 
