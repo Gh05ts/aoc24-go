@@ -58,29 +58,59 @@ func ioConvert(reader *bufioCloser) [][]rune {
 
 func XmasCounter(lines [][]rune, stage string) int {
 	var word string
+	// var stageFlag bool
 	if strings.Compare(stage, "v2") != 0 {
-		fmt.Println("No Peeking")
+		// stageFlag = false
 		word = searchWord
 	} else {
+		// stageFlag = true
 		word = searchWord2
 	}
 	positions := findAllOccurences(lines, word)
+	// if stageFlag {
+	// 	positions = findIntersections(positions)
+	// }
 	return len(positions)
 }
 
 func findAllOccurences(grid [][]rune, word string) [][]int {
-	directions := [][]int{
-		{0, 1}, {1, 0}, {1, 1}, {1, -1},
-		{0, -1}, {-1, 0}, {-1, -1}, {-1, 1},
+	var directions [][]int
+	var stageFlag bool
+	if strings.Compare(word, searchWord) == 0 {
+		stageFlag = false
+		directions = [][]int{
+			{0, 1}, {1, 0}, {1, 1}, {1, -1},
+			{0, -1}, {-1, 0}, {-1, -1}, {-1, 1},
+		}
+	} else {
+		stageFlag = true
+		directions = [][]int{
+			{1, 1}, {1, -1}, {-1, -1}, {-1, 1},
+		}
 	}
 
 	var positions [][]int
+	seen := make(map[string]int)
 
 	for i := range grid {
 		for j := range grid[i] {
 			for _, dir := range directions {
 				if search(grid, word, i, j, dir) {
-					positions = append(positions, []int{i, j})
+					if stageFlag {
+						// position of char 'A'
+						// storing in hashmap
+						// multiple same A is a match
+						position := []int{i + dir[0], j + dir[1]}
+						key := arrayToString(position)
+						if _, found := seen[key]; found {
+							positions = append(positions, position)
+							seen[key]++
+						} else {
+							seen[key] = 1
+						}
+					} else {
+						positions = append(positions, []int{i, j})
+					}
 				}
 			}
 		}
@@ -98,4 +128,23 @@ func search(grid [][]rune, word string, row, col int, dir []int) bool {
 		}
 	}
 	return true
+}
+
+// func findIntersections(positions [][]int) [][]int {
+// 	seen := make(map[string]int)
+// 	intersections := [][]int{}
+// 	for _, array := range positions {
+// 		key := arrayToString(array)
+// 		if _, found := seen[key]; found {
+// 			intersections = append(intersections, array)
+// 			seen[key]++
+// 		} else {
+// 			seen[key] = 1
+// 		}
+// 	}
+// 	return intersections
+// }
+
+func arrayToString(position []int) string {
+	return fmt.Sprint(position)
 }
