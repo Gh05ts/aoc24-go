@@ -58,18 +58,12 @@ func ioConvert(reader *bufioCloser) [][]rune {
 
 func XmasCounter(lines [][]rune, stage string) int {
 	var word string
-	// var stageFlag bool
 	if strings.Compare(stage, "v2") != 0 {
-		// stageFlag = false
 		word = searchWord
 	} else {
-		// stageFlag = true
 		word = searchWord2
 	}
 	positions := findAllOccurences(lines, word)
-	// if stageFlag {
-	// 	positions = findIntersections(positions)
-	// }
 	return len(positions)
 }
 
@@ -129,21 +123,6 @@ func search(grid [][]rune, word string, row, col int, dir []int) bool {
 	}
 	return true
 }
-
-// func findIntersections(positions [][]int) [][]int {
-// 	seen := make(map[string]int)
-// 	intersections := [][]int{}
-// 	for _, array := range positions {
-// 		key := arrayToString(array)
-// 		if _, found := seen[key]; found {
-// 			intersections = append(intersections, array)
-// 			seen[key]++
-// 		} else {
-// 			seen[key] = 1
-// 		}
-// 	}
-// 	return intersections
-// }
 
 func arrayToString(position []int) string {
 	return fmt.Sprint(position)
