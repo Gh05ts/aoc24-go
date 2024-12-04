@@ -54,9 +54,9 @@ func main() {
 	dontIdx := 0
 	doIdx := 0
 	allowFlag := true
-	re = regexp.MustCompile(`mul\([0-9]+,[0-9]+\)`)
+	re = regexp.MustCompile(`mul\([0-9]{1,3},[0-9]{1,3}\)`)
 	for _, match := range re.FindAllStringIndex(strContent, -1) {
-		reg := regexp.MustCompile(`\d+`)
+		reg := regexp.MustCompile(`\d{1,3}`)
 		mul := 0
 		start := match[0]
 		end := match[1]
