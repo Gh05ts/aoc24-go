@@ -82,10 +82,10 @@ func atoiWrap(number string) int {
 }
 
 func MiddleSum(ops, rules [][]int, stage string) int {
-	count := 0
-	_, backwardMap := opsToOpsMap(ops)
-	failed := []int{}
-	for i, val := range rules {
+	countCorrect := 0
+	countCorrected := 0
+	backwardMap := opsToOpsMap(ops)
+	for _, val := range rules {
 		seen := []int{}
 		violated := false
 		for _, cur := range val {
@@ -99,52 +99,40 @@ func MiddleSum(ops, rules [][]int, stage string) int {
 			}
 			seen = append(seen, cur)
 		}
+		middle := 0
 		if !violated {
-			middle := seen[len(seen)/2]
-			count += middle
+			middle = seen[len(seen)/2]
+			countCorrect += middle
 		} else {
-			failed = append(failed, i)
+			correctMap := make(map[int]int)
+			for _, cur := range val {
+				lenBack := 0
+				for _, check := range val {
+					if _, found := backwardMap[cur][check]; found {
+						lenBack++
+					}
+				}
+				correctMap[lenBack] = cur
+			}
+			middle = correctMap[len(val)/2]
+			countCorrected += middle
 		}
 	}
 	if strings.Compare(stage, "v2") == 0 {
-		count = corrections(rules, failed, backwardMap)
+		return countCorrected
 	}
-	return count
+	return countCorrect
 }
 
-func opsToOpsMap(ops [][]int) (forwardMap, backwardMap map[int]map[int]bool) {
-	fwMap := make(map[int]map[int]bool)
+func opsToOpsMap(ops [][]int) (backwardMap map[int]map[int]bool) {
 	bwMap := make(map[int]map[int]bool)
 	for _, op := range ops {
 		key := op[0]
 		val := op[1]
-		if _, found := fwMap[key]; !found {
-			fwMap[key] = make(map[int]bool)
-		}
-		fwMap[key][val] = true
 		if _, found := bwMap[val]; !found {
 			bwMap[val] = make(map[int]bool)
 		}
 		bwMap[val][key] = true
 	}
-	return fwMap, bwMap
-}
-
-func corrections(rules [][]int, failedIndices []int, backwardMap map[int]map[int]bool) int {
-	count := 0
-	for _, index := range failedIndices {
-		rule := rules[index]
-		correctMap := make(map[int]int)
-		for _, val := range rule {
-			lenBack := 0
-			for _, check := range rule {
-				if _, found := backwardMap[val][check]; found {
-					lenBack++
-				}
-			}
-			correctMap[lenBack] = val
-		}
-		count += correctMap[len(rule)/2]
-	}
-	return count
+	return bwMap
 }
