@@ -54,22 +54,22 @@ func ioConvert(reader *bufioCloser) (rulesArray, opsArray [][]int) {
 				opsFlag = true
 				continue
 			}
-			ops = append(ops, stringToIntArray(line, ","))
+			ops = append(ops, stringToIntSlice(line, ","))
 		} else {
-			rules = append(rules, stringToIntArray(line, "|"))
+			rules = append(rules, stringToIntSlice(line, "|"))
 		}
 	}
 	return rules, ops
 }
 
-func stringToIntArray(str string, sep string) []int {
-	stringArray := strings.Split(str, sep)
-	intArray := []int{}
-	for _, str := range stringArray {
+func stringToIntSlice(str string, sep string) []int {
+	stringSlice := strings.Split(str, sep)
+	intSlice := []int{}
+	for _, str := range stringSlice {
 		num := atoiWrap(str)
-		intArray = append(intArray, num)
+		intSlice = append(intSlice, num)
 	}
-	return intArray
+	return intSlice
 }
 
 func atoiWrap(number string) int {
@@ -84,14 +84,14 @@ func atoiWrap(number string) int {
 func MiddleSum(ops, rules [][]int, stage string) int {
 	countCorrect := 0
 	countCorrected := 0
-	backwardMap := opsToOpsMap(ops)
+	previousNodes := previousNodes(ops)
 
 	for _, rule := range rules {
 		seen := []int{}
 		violated := false
 		for _, val := range rule {
-			for _, prevVal := range seen {
-				if _, found := backwardMap[val][prevVal]; !found {
+			for _, check := range seen {
+				if _, found := previousNodes[val][check]; !found {
 					violated = true
 					break
 				}
@@ -103,19 +103,19 @@ func MiddleSum(ops, rules [][]int, stage string) int {
 		}
 
 		if !violated {
-			countCorrect += seen[len(seen)/2]
+			countCorrect += seen[len(rule)/2]
 		} else {
-			correctMap := make(map[int]int)
+			positions := make(map[int]int)
 			for _, val := range rule {
 				position := 0
 				for _, check := range rule {
-					if _, found := backwardMap[val][check]; found {
+					if _, found := previousNodes[val][check]; found {
 						position++
 					}
 				}
-				correctMap[position] = val
+				positions[position] = val
 			}
-			countCorrected += correctMap[len(rule)/2]
+			countCorrected += positions[len(rule)/2]
 		}
 	}
 
@@ -125,15 +125,15 @@ func MiddleSum(ops, rules [][]int, stage string) int {
 	return countCorrect
 }
 
-func opsToOpsMap(ops [][]int) (backwardMap map[int]map[int]bool) {
-	bwMap := make(map[int]map[int]bool)
+func previousNodes(ops [][]int) (previousNodes map[int]map[int]bool) {
+	Nodes := make(map[int]map[int]bool)
 	for _, op := range ops {
 		key := op[0]
 		val := op[1]
-		if _, found := bwMap[val]; !found {
-			bwMap[val] = make(map[int]bool)
+		if _, found := Nodes[val]; !found {
+			Nodes[val] = make(map[int]bool)
 		}
-		bwMap[val][key] = true
+		Nodes[val][key] = true
 	}
-	return bwMap
+	return Nodes
 }
