@@ -85,39 +85,40 @@ func MiddleSum(ops, rules [][]int, stage string) int {
 	countCorrect := 0
 	countCorrected := 0
 	backwardMap := opsToOpsMap(ops)
-	for _, val := range rules {
+
+	for _, rule := range rules {
 		seen := []int{}
 		violated := false
-		for _, cur := range val {
-			// loop seen and check if any matches?
-			// can this be improved?
-			for _, val := range seen {
-				if !backwardMap[cur][val] {
+		for _, val := range rule {
+			for _, prevVal := range seen {
+				if !backwardMap[val][prevVal] {
 					violated = true
 					break
 				}
 			}
-			seen = append(seen, cur)
+			if violated {
+				break
+			}
+			seen = append(seen, val)
 		}
-		middle := 0
+
 		if !violated {
-			middle = seen[len(seen)/2]
-			countCorrect += middle
+			countCorrect += seen[len(seen)/2]
 		} else {
 			correctMap := make(map[int]int)
-			for _, cur := range val {
-				lenBack := 0
-				for _, check := range val {
+			for _, cur := range rule {
+				position := 0
+				for _, check := range rule {
 					if _, found := backwardMap[cur][check]; found {
-						lenBack++
+						position++
 					}
 				}
-				correctMap[lenBack] = cur
+				correctMap[position] = cur
 			}
-			middle = correctMap[len(val)/2]
-			countCorrected += middle
+			countCorrected += correctMap[len(rule)/2]
 		}
 	}
+
 	if strings.Compare(stage, "v2") == 0 {
 		return countCorrected
 	}
