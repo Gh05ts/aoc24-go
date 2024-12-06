@@ -106,14 +106,14 @@ func MiddleSum(ops, rules [][]int, stage string) int {
 			countCorrect += seen[len(seen)/2]
 		} else {
 			correctMap := make(map[int]int)
-			for _, cur := range rule {
+			for _, val := range rule {
 				position := 0
 				for _, check := range rule {
-					if _, found := backwardMap[cur][check]; found {
+					if _, found := backwardMap[val][check]; found {
 						position++
 					}
 				}
-				correctMap[position] = cur
+				correctMap[position] = val
 			}
 			countCorrected += correctMap[len(rule)/2]
 		}
