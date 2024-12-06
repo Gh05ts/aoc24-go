@@ -91,7 +91,7 @@ func MiddleSum(ops, rules [][]int, stage string) int {
 		violated := false
 		for _, val := range rule {
 			for _, prevVal := range seen {
-				if !backwardMap[val][prevVal] {
+				if _, found := backwardMap[val][prevVal]; !found {
 					violated = true
 					break
 				}
