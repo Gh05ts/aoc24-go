@@ -25,8 +25,8 @@ func main() {
 	defer reader.Close()
 
 	rules, ops := ioConvert(reader)
-	count := MiddleSum(rules, ops, args[1])
-	fmt.Println(count)
+	sum := MiddleSum(rules, ops, args[1])
+	fmt.Println(sum)
 }
 
 func fileReader(path string) *bufioCloser {
@@ -82,8 +82,8 @@ func atoiWrap(number string) int {
 }
 
 func MiddleSum(ops, rules [][]int, stage string) int {
-	countCorrect := 0
-	countCorrected := 0
+	sumCorrect := 0
+	sumCorrected := 0
 	previousNodes := previousNodes(ops)
 
 	for _, rule := range rules {
@@ -103,7 +103,7 @@ func MiddleSum(ops, rules [][]int, stage string) int {
 		}
 
 		if !violated {
-			countCorrect += seen[len(rule)/2]
+			sumCorrect += seen[len(rule)/2]
 		} else {
 			positions := make(map[int]int)
 			for _, val := range rule {
@@ -115,14 +115,14 @@ func MiddleSum(ops, rules [][]int, stage string) int {
 				}
 				positions[position] = val
 			}
-			countCorrected += positions[len(rule)/2]
+			sumCorrected += positions[len(rule)/2]
 		}
 	}
 
 	if strings.Compare(stage, "v2") == 0 {
-		return countCorrected
+		return sumCorrected
 	}
-	return countCorrect
+	return sumCorrect
 }
 
 func previousNodes(ops [][]int) (previousNodes map[int]map[int]bool) {
