@@ -92,6 +92,7 @@ type pairDir struct {
 // then re run traverse and check for loops
 func loopCheck(grid [][]rune, startingLoc [2]int, visited map[pair]bool) int {
 	count := 0
+	delete(visited, pair{startingLoc[0], startingLoc[1]})
 	for location := range visited {
 		grid[location.x][location.y] = '#'
 		_, isLoop := traverse(grid, startingLoc)
