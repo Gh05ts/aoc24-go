@@ -102,25 +102,8 @@ func canFormTarget(nums []int, target int, current int, index int, memo map[stri
 		return result
 	}
 
-	if index == len(nums)-1 {
-		if current+nums[index] == target {
-			memo[key] = true
-			return true
-		}
-		if current*nums[index] == target {
-			memo[key] = true
-			return true
-		}
-		if concatAllowed {
-			concatenated := concatenateNumbers(current, nums[index])
-			if concatenated == target {
-				memo[key] = true
-				return true
-			}
-		}
-
-		memo[key] = false
-		return false
+	if index == len(nums) {
+		return current == target
 	}
 
 	if canFormTarget(nums, target, current+nums[index], index+1, memo, concatAllowed) {
