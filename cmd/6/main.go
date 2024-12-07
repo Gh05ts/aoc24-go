@@ -88,6 +88,8 @@ type pairDir struct {
 	x, y, dir int
 }
 
+// use the path visited to place obstacles
+// then re run traverse and check for loops
 func loopCheck(grid [][]rune, startingLoc [2]int, visited map[pair]bool) int {
 	count := 0
 	for location := range visited {
@@ -115,14 +117,19 @@ func traverse(grid [][]rune, startingLoc [2]int) (map[pair]bool, bool) {
 	visitedDir[pairDir{x, y, directionIdx}] = true
 	for {
 		nextX, nextY := x+directions[directionIdx][0], y+directions[directionIdx][1]
+
+		// for checking loops
 		if _, found := visitedDir[pairDir{nextX, nextY, directionIdx}]; found {
 			return visited, true
 		}
+
 		if !(nextX >= 0 && nextX < len(grid[0]) && nextY >= 0 && nextY < len(grid)) {
 			break
 		} else if grid[nextX][nextY] == rune('.') {
 			x, y = nextX, nextY
 			visited[pair{x, y}] = true
+
+			// for checking loops
 			visitedDir[pairDir{x, y, directionIdx}] = true
 		} else {
 			directionIdx = (directionIdx + 1) % len(directions)
