@@ -27,8 +27,8 @@ func main() {
 	defer reader.Close()
 
 	targetInputs := ioConvert(reader)
-	count := validCount(targetInputs, args[1])
-	fmt.Println(count)
+	sum := validSum(targetInputs, args[1])
+	fmt.Println(sum)
 }
 
 func fileReader(path string) *bufioCloser {
@@ -82,17 +82,17 @@ func atoiWrap(number string) int {
 	return num
 }
 
-func validCount(targetInputs map[pair][]int, stage string) int {
-	count := 0
+func validSum(targetInputs map[pair][]int, stage string) int {
+	sum := 0
 	allowed := strings.Compare(stage, "v2") == 0
 	for target, inputs := range targetInputs {
 		memo := make(map[string]bool)
 		if canFormTarget(inputs, target.y, inputs[0], 1, memo, allowed) {
-			count += target.y
+			sum += target.y
 		}
 		maps.Clear(memo)
 	}
-	return count
+	return sum
 }
 
 func canFormTarget(nums []int, target int, current int, index int, memo map[string]bool, concatAllowed bool) bool {
