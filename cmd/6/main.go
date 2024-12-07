@@ -6,7 +6,6 @@ import (
 	"io"
 	"os"
 	"strings"
-	"time"
 )
 
 type bufioCloser struct {
@@ -71,10 +70,10 @@ func count(grid [][]rune, stage string) int {
 	}
 	visited, _ := traverse(grid, startingLocation)
 	if strings.Compare(stage, "v2") == 0 {
-		start := time.Now()
+		// start := time.Now()
 		count := loopCheck(grid, startingLocation, visited)
-		end := time.Now()
-		fmt.Println("time taken:", end.Sub(start))
+		// end := time.Now()
+		// fmt.Println("time taken:", end.Sub(start))
 		return count
 	} else {
 		return len(visited)
