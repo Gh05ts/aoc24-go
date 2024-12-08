@@ -83,14 +83,14 @@ func findAllLocations(grid [][]rune, stage string) int {
 }
 
 // struct to encapsulate point with all the info for operations on it
-// op1, op2 are the signs for add/ sub with 0 as sub and 1 as add
-// p1 and p2 are the values to be added to point.x and point.y
-// b1 and b2 are the bounds
+// opX, opY are the signs for add/ sub with 0 as sub and 1 as add
+// pX and pY are the values to be added to point.x and point.y
+// bX and bY are the bounds
 type pairOp struct {
 	point    pair
-	op1, op2 int
-	p1, p2   int
-	b1, b2   int
+	opX, opY int
+	pX, pY   int
+	bX, bY   int
 }
 
 func addValidLocations(locations []pair, i, j, height, width int, uniqueLocations map[pair]bool, loop bool) {
@@ -123,7 +123,7 @@ func addValidLocations(locations []pair, i, j, height, width int, uniqueLocation
 func populateMap(po pairOp, loop bool, uniqueLocations map[pair]bool) {
 	for {
 		nextPoint := ApplyOp(po)
-		if !isValid(nextPoint, po.b1, po.b2) {
+		if !isValid(nextPoint, po.bX, po.bY) {
 			break
 		}
 		po.point = nextPoint
@@ -138,17 +138,17 @@ func populateMap(po pairOp, loop bool, uniqueLocations map[pair]bool) {
 
 // function for abstracting adding to diagonals
 // 0 means - and 1 means +
-// op1 goes to inp.x and op2 goes to inp.y
-// p1 and p2 are the parameters to be applied to inp.x and inp.y respectively
+// opX goes to inp.x and opY goes to inp.y
+// pX and pY are the parameters to be applied to inp.x and inp.y respectively
 func ApplyOp(po pairOp) pair {
-	if po.op1 == 0 && po.op2 == 0 {
-		return pair{po.point.x - po.p1, po.point.y - po.p2}
-	} else if po.op1 == 0 {
-		return pair{po.point.x - po.p1, po.point.y + po.p2}
-	} else if po.op1 == 1 && po.op2 == 1 {
-		return pair{po.point.x + po.p1, po.point.y + po.p2}
+	if po.opX == 0 && po.opY == 0 {
+		return pair{po.point.x - po.pX, po.point.y - po.pY}
+	} else if po.opX == 0 {
+		return pair{po.point.x - po.pX, po.point.y + po.pY}
+	} else if po.opX == 1 && po.opY == 1 {
+		return pair{po.point.x + po.pX, po.point.y + po.pY}
 	} else {
-		return pair{po.point.x + po.p1, po.point.y - po.p2}
+		return pair{po.point.x + po.pX, po.point.y - po.pY}
 	}
 }
 
