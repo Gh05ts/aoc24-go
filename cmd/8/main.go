@@ -75,7 +75,7 @@ func findAllLocations(grid [][]rune, stage string) int {
 	for _, locations := range runeLocations {
 		for i := 0; i < len(locations); i++ {
 			for j := i + 1; j < len(locations); j++ {
-				addValidLocations(locations, i, j, height, width, uniqueLocations, recursiveFlag)
+				addAllValidLocationsForPoints(locations, i, j, height, width, uniqueLocations, recursiveFlag)
 			}
 		}
 	}
@@ -93,7 +93,7 @@ type pairOp struct {
 	bX, bY   int
 }
 
-func addValidLocations(locations []pair, i, j, height, width int, uniqueLocations map[pair]bool, loop bool) {
+func addAllValidLocationsForPoints(locations []pair, i, j, height, width int, uniqueLocations map[pair]bool, loop bool) {
 	pointA := locations[i]
 	pointB := locations[j]
 
@@ -108,19 +108,19 @@ func addValidLocations(locations []pair, i, j, height, width int, uniqueLocation
 	if pointA.y > pointB.y { // +ve slope diagonal
 		diffHeight = pointB.x - pointA.x
 		diffLen = pointA.y - pointB.y
-		populateMap(pairOp{pointA, 0, 1, diffHeight, diffLen, height, width}, loop, uniqueLocations)
-		populateMap(pairOp{pointB, 1, 0, diffHeight, diffLen, height, width}, loop, uniqueLocations)
+		populateDiagonalWithOp(pairOp{pointA, 0, 1, diffHeight, diffLen, height, width}, loop, uniqueLocations)
+		populateDiagonalWithOp(pairOp{pointB, 1, 0, diffHeight, diffLen, height, width}, loop, uniqueLocations)
 	} else {
 		diffHeight = pointB.x - pointA.x
 		diffLen = pointB.y - pointA.y
-		populateMap(pairOp{pointA, 0, 0, diffHeight, diffLen, height, width}, loop, uniqueLocations)
-		populateMap(pairOp{pointB, 1, 1, diffHeight, diffLen, height, width}, loop, uniqueLocations)
+		populateDiagonalWithOp(pairOp{pointA, 0, 0, diffHeight, diffLen, height, width}, loop, uniqueLocations)
+		populateDiagonalWithOp(pairOp{pointB, 1, 1, diffHeight, diffLen, height, width}, loop, uniqueLocations)
 	}
 }
 
 // if loop that means stage 2 search exhaustively otherwise break preemptively
 // the point inside the datastructure pairOp is updated to mark moving to next point
-func populateMap(po pairOp, loop bool, uniqueLocations map[pair]bool) {
+func populateDiagonalWithOp(po pairOp, loop bool, uniqueLocations map[pair]bool) {
 	for {
 		nextPoint := ApplyOp(po)
 		if !isValid(nextPoint, po.bX, po.bY) {
