@@ -82,29 +82,39 @@ func findAllLocations(grid [][]rune, stage string) int {
 	return len(uniqueLocations)
 }
 
+// struct to encapsulate point with all the info for operations on it
+// op1, op2 are the signs for add/ sub with 0 as sub and 1 as add
+// p1 and p2 are the values to be added to point.x and point.y
+// b1 and b2 are the bounds
+type pairOp struct {
+	point    pair
+	op1, op2 int
+	p1, p2   int
+	b1, b2   int
+}
+
 func addValidLocations(locations []pair, i, j, height, width int, uniqueLocations map[pair]bool, loop bool) {
 	pointA := locations[i]
 	pointB := locations[j]
 
-	points := []pair{}
+	// in stage 2, even the original location is considered an antitode
+	if loop {
+		uniqueLocations[pointA] = true
+		uniqueLocations[pointB] = true
+	}
+
 	diffHeight := 0
 	diffLen := 0
-	if pointA.y > pointB.y { // diagonal
+	if pointA.y > pointB.y { // +ve slope diagonal
 		diffHeight = pointB.x - pointA.x
 		diffLen = pointA.y - pointB.y
-		points = append(points, pair{pointA.x - diffHeight, pointA.y + diffLen})
-		points = append(points, pair{pointB.x + diffHeight, pointB.y - diffLen})
+		populateMap(pairOp{pointA, 0, 1, diffHeight, diffLen, height, width}, loop, uniqueLocations)
+		populateMap(pairOp{pointB, 1, 0, diffHeight, diffLen, height, width}, loop, uniqueLocations)
 	} else {
 		diffHeight = pointB.x - pointA.x
 		diffLen = pointB.y - pointA.y
-		points = append(points, pair{pointA.x - diffHeight, pointA.y - diffLen})
-		points = append(points, pair{pointB.x + diffHeight, pointB.y + diffLen})
-	}
-
-	for _, point := range points {
-		if isValid(point, height, width) {
-			uniqueLocations[point] = true
-		}
+		populateMap(pairOp{pointA, 0, 0, diffHeight, diffLen, height, width}, loop, uniqueLocations)
+		populateMap(pairOp{pointB, 1, 1, diffHeight, diffLen, height, width}, loop, uniqueLocations)
 	}
 }
 
@@ -112,8 +122,36 @@ func isValid(point pair, len, wid int) bool {
 	return point.x >= 0 && point.x < len && point.y >= 0 && point.y < wid
 }
 
-func ApplyOp(inp pair, x, y int) pair {
-	out := pair{}
+// function for abstracting adding to diagonals
+// 0 means - and 1 means +
+// op1 goes to inp.x and op2 goes to inp.y
+// p1 and p2 are the parameters to be applied to inp.x and inp.y respectively
+func ApplyOp(po pairOp) pair {
+	if po.op1 == 0 && po.op2 == 0 {
+		return pair{po.point.x - po.p1, po.point.y - po.p2}
+	} else if po.op1 == 0 {
+		return pair{po.point.x - po.p1, po.point.y + po.p2}
+	} else if po.op1 == 1 && po.op2 == 1 {
+		return pair{po.point.x + po.p1, po.point.y + po.p2}
+	} else {
+		return pair{po.point.x + po.p1, po.point.y - po.p2}
+	}
+}
 
-	return out
+// if loop that means stage 2 search exhaustively otherwise break preemptively
+// the point inside the datastructure pairOp is updated to mark moving to next point
+func populateMap(po pairOp, loop bool, uniqueLocations map[pair]bool) {
+	for {
+		nextPoint := ApplyOp(po)
+		if !isValid(nextPoint, po.b1, po.b2) {
+			break
+		}
+		po.point = nextPoint
+		uniqueLocations[nextPoint] = true
+		if loop {
+			continue
+		} else {
+			break
+		}
+	}
 }
