@@ -118,8 +118,22 @@ func addValidLocations(locations []pair, i, j, height, width int, uniqueLocation
 	}
 }
 
-func isValid(point pair, len, wid int) bool {
-	return point.x >= 0 && point.x < len && point.y >= 0 && point.y < wid
+// if loop that means stage 2 search exhaustively otherwise break preemptively
+// the point inside the datastructure pairOp is updated to mark moving to next point
+func populateMap(po pairOp, loop bool, uniqueLocations map[pair]bool) {
+	for {
+		nextPoint := ApplyOp(po)
+		if !isValid(nextPoint, po.b1, po.b2) {
+			break
+		}
+		po.point = nextPoint
+		uniqueLocations[nextPoint] = true
+		if loop {
+			continue
+		} else {
+			break
+		}
+	}
 }
 
 // function for abstracting adding to diagonals
@@ -138,20 +152,6 @@ func ApplyOp(po pairOp) pair {
 	}
 }
 
-// if loop that means stage 2 search exhaustively otherwise break preemptively
-// the point inside the datastructure pairOp is updated to mark moving to next point
-func populateMap(po pairOp, loop bool, uniqueLocations map[pair]bool) {
-	for {
-		nextPoint := ApplyOp(po)
-		if !isValid(nextPoint, po.b1, po.b2) {
-			break
-		}
-		po.point = nextPoint
-		uniqueLocations[nextPoint] = true
-		if loop {
-			continue
-		} else {
-			break
-		}
-	}
+func isValid(point pair, len, wid int) bool {
+	return point.x >= 0 && point.x < len && point.y >= 0 && point.y < wid
 }
