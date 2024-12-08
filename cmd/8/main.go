@@ -86,30 +86,8 @@ func addValidLocations(locations []pair, i, j, height, width int, uniqueLocation
 	pointB := locations[j]
 
 	var point1, point2 pair
-	// diff := 0
 	diffHeight := 0
 	diffLen := 0
-	// true for general solution but given how input is taken and read, impossible
-	// if pointA.x == pointB.x && pointA.y > pointB.y { // horizontal
-	// 	diff = pointA.y - pointB.y
-	// 	point1 = pair{pointA.x, pointA.y + diff}
-	// 	point2 = pair{pointA.x, pointB.y - diff}
-	// }
-	// else if pointA.y == pointB.y && pointA.x > pointB.x { // vertical
-	// 	diff = pointA.x - pointB.x
-	// 	point1 = pair{pointA.x + diff, pointA.y}
-	// 	point2 = pair{pointB.x - diff, pointA.y}
-	// }
-	// input only has diagonals
-	// if pointA.x == pointB.x {
-	// 	diff = pointB.y - pointA.y
-	// 	point1 = pair{pointA.x, pointB.y + diff}
-	// 	point2 = pair{pointA.x, pointA.y - diff}
-	// } else if pointA.y == pointB.y {
-	// 	diff = pointB.x - pointA.x
-	// 	point1 = pair{pointB.x + diff, pointA.y}
-	// 	point2 = pair{pointA.x - diff, pointA.y}
-	// } else
 	if pointA.y > pointB.y { // diagonal
 		diffHeight = pointB.x - pointA.x
 		diffLen = pointA.y - pointB.y
