@@ -97,11 +97,10 @@ func sum(content []byte, fullFlag bool) int {
 			}
 		}
 	} else {
-		for {
-			// elementIndex := len(elements) - 1
-			// origElem := elementsIdxSize[elementIndex]
-
-		}
+		// for {
+		// elementIndex := len(elements) - 1
+		// origElem := elementsIdxSize[elementIndex]
+		// }
 	}
 
 	printRune(result)
