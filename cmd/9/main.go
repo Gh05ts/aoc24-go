@@ -86,19 +86,9 @@ func sum(filesArray, emptyArray []int, fullFileSwap bool) int64 {
 			}
 		}
 	} else {
-		i := len(result) - 1
-		for i >= 0 {
-			if result[i] == rune('𠔐') || result[i] == rune('𠔀') {
-				i -= 1
-				continue
-			}
-
-			fileWidth := 0
-			fileID := result[i]
-			for i >= 0 && fileID == result[i] {
-				fileWidth++
-				i -= 1
-			}
+		for i := len(elements) - 1; i >= 0; i-- {
+			fileWidth := elements[i].size
+			fileID := elements[i].value
 
 			smallestIdx := math.MaxInt
 			resultIdx := math.MaxInt
@@ -110,7 +100,7 @@ func sum(filesArray, emptyArray []int, fullFileSwap bool) int64 {
 					bestWidth = size
 				}
 			}
-			if smallestIdx == math.MaxInt || resultIdx > i {
+			if smallestIdx == math.MaxInt || resultIdx > elements[i].idx {
 				continue
 			}
 
@@ -118,7 +108,7 @@ func sum(filesArray, emptyArray []int, fullFileSwap bool) int64 {
 			if typed, ok := emptySpace.(pair); ok {
 				newLength := spaces[typed.emptyIdx].size - fileWidth
 				for j := 0; j < fileWidth; j++ {
-					result[i+j+1] = rune('𠔀')
+					result[elements[i].idx+j] = rune('𠔀')
 					result[spaces[typed.emptyIdx].idx+j] = fileID
 				}
 				spaces[typed.emptyIdx].idx += fileWidth
@@ -181,18 +171,19 @@ func fill(arr *[]rune, val rune, times int) {
 	}
 }
 
-func printRune(result []rune) {
-	for _, c := range result {
-		if c != rune('𠔐') && c != rune('𠔀') {
-			fmt.Print(c)
-		} else if c == rune('𠔐') {
-			fmt.Print(string('𠔐'))
-		} else {
-			fmt.Print(string('𠔀'))
-		}
-	}
-	fmt.Println()
-}
+// for debugging
+// func printRune(result []rune) {
+// 	for _, c := range result {
+// 		if c != rune('𠔐') && c != rune('𠔀') {
+// 			fmt.Print(c)
+// 		} else if c == rune('𠔐') {
+// 			fmt.Print(string('𠔐'))
+// 		} else {
+// 			fmt.Print(string('𠔀'))
+// 		}
+// 	}
+// 	fmt.Println()
+// }
 
 type PairHeap []pair
 
