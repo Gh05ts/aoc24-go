@@ -1,6 +1,7 @@
 package main
 
 import (
+	"container/heap"
 	"fmt"
 	"math"
 	"os"
@@ -61,10 +62,6 @@ func atoiWrap(number string) int {
 
 func sum(filesArray, emptyArray []int, fullFileSwap bool) int64 {
 	result, elements, spaces, sizeSpaceIdx := prepareInput(filesArray, emptyArray)
-	printRune(result)
-	// fmt.Println(spaces)
-	// fmt.Println(elements)
-	// fmt.Println(sizeSpaceIdx)
 
 	if !fullFileSwap {
 		lastElementIdx := len(elements) - 1
@@ -89,39 +86,50 @@ func sum(filesArray, emptyArray []int, fullFileSwap bool) int64 {
 			}
 		}
 	} else {
-		for i := len(elements) - 1; i >= 0; i-- {
-			curElement := elements[i]
-			bestFit := search(sizeSpaceIdx, curElement)
-			if bestFit != -1 {
-				emptySpace := spaces[bestFit]
-				for i := 0; i < curElement.size; i++ {
-					result[curElement.idx+i] = rune('𠔀')
-					result[emptySpace.idx+i] = curElement.value
+		i := len(result) - 1
+		for i >= 0 {
+			if result[i] == rune('𠔐') || result[i] == rune('𠔀') {
+				i -= 1
+				continue
+			}
+
+			fileWidth := 0
+			fileID := result[i]
+			for i >= 0 && fileID == result[i] {
+				fileWidth++
+				i -= 1
+			}
+
+			smallestIdx := math.MaxInt
+			resultIdx := math.MaxInt
+			bestWidth := -1
+			for size := fileWidth; size < 10; size++ {
+				if sizeSpaceIdx[size] != nil && sizeSpaceIdx[size].Len() > 0 && resultIdx > (*sizeSpaceIdx[size])[0].resultIdx {
+					smallestIdx = (*sizeSpaceIdx[size])[0].emptyIdx
+					resultIdx = (*sizeSpaceIdx[size])[0].resultIdx
+					bestWidth = size
 				}
-				sizeSpaceIdx[emptySpace.size] = sizeSpaceIdx[emptySpace.size][1:]
-				newLength := emptySpace.size - curElement.size
-				spaces[bestFit].idx += curElement.size
-				spaces[bestFit].size -= curElement.size
-				if newLength != 0 {
-					arr := sizeSpaceIdx[newLength]
-					idx := -1
-					for i := 0; i < len(arr); i++ {
-						if arr[i].resultIdx >= emptySpace.idx+curElement.size {
-							idx = i
-							break
-						}
-					}
-					if idx == -1 {
-						idx = len(arr)
-					}
-					sizeSpaceIdx[newLength] = append(sizeSpaceIdx[newLength][:idx], append([]pair{{emptySpace.idx + curElement.size, bestFit}}, sizeSpaceIdx[newLength][idx:]...)...)
+			}
+			if smallestIdx == math.MaxInt || resultIdx > i {
+				continue
+			}
+
+			emptySpace := heap.Pop(sizeSpaceIdx[bestWidth])
+			if typed, ok := emptySpace.(pair); ok {
+				newLength := spaces[typed.emptyIdx].size - fileWidth
+				for j := 0; j < fileWidth; j++ {
+					result[i+j+1] = rune('𠔀')
+					result[spaces[typed.emptyIdx].idx+j] = fileID
+				}
+				spaces[typed.emptyIdx].idx += fileWidth
+				spaces[typed.emptyIdx].size -= fileWidth
+				if newLength > 0 {
+					heap.Push(sizeSpaceIdx[newLength], pair{typed.resultIdx + fileWidth, typed.emptyIdx})
 				}
 			}
 		}
 	}
 
-	fmt.Println(len(result))
-	printRune(result)
 	checksum := getCheckSum(result)
 	return checksum
 }
@@ -137,20 +145,10 @@ func getCheckSum(result []rune) int64 {
 	return sum
 }
 
-func prepareInput(filesArray, emptyArray []int) (final []rune, elements, spaces []tuple, emptySizeSort map[int][]pair) {
+func prepareInput(filesArray, emptyArray []int) (final []rune, elements, spaces []tuple, emptySizeSort map[int]*PairHeap) {
 	result := []rune{}
 	elementsIdxSize, emptyIdxSize := []tuple{}, []tuple{}
-	emptySizeSortIdx := make(map[int][]pair)
-
-	// h := &PairHeap{}
-	// heap.Init(h)
-	// heap.Push(h, pair{0, 0})
-	// // heap.Fix(h, 0)
-	// // heap.Remove(h, 0)
-	// for h.Len() > 0 {
-	// 	fmt.Println(heap.Pop(h))
-	// 	fmt.Println((*h)[0])
-	// }
+	emptySizeSortIdx := make(map[int]*PairHeap)
 
 	startEmptyIdx, endEmptyIdx := 0, len(emptyArray)-1
 	for i := 0; i < len(filesArray); i++ {
@@ -163,9 +161,10 @@ func prepareInput(filesArray, emptyArray []int) (final []rune, elements, spaces 
 			emptySpaceSize := int(emptyArray[startEmptyIdx])
 			if emptySpaceSize > 0 {
 				if _, found := emptySizeSortIdx[emptySpaceSize]; !found {
-					emptySizeSortIdx[emptySpaceSize] = []pair{}
+					emptySizeSortIdx[emptySpaceSize] = &PairHeap{}
+					heap.Init(emptySizeSortIdx[emptySpaceSize])
 				}
-				emptySizeSortIdx[emptySpaceSize] = append(emptySizeSortIdx[emptySpaceSize], pair{emptySpaceIdx, len(emptyIdxSize)})
+				heap.Push(emptySizeSortIdx[emptySpaceSize], pair{emptySpaceIdx, len(emptyIdxSize)})
 				emptyIdxSize = append(emptyIdxSize, tuple{emptySpaceIdx, emptySpaceSize, rune('𠔐')})
 			}
 			fill(&result, rune('𠔐'), emptySpaceSize)
@@ -185,67 +184,15 @@ func fill(arr *[]rune, val rune, times int) {
 func printRune(result []rune) {
 	for _, c := range result {
 		if c != rune('𠔐') && c != rune('𠔀') {
-			// fmt.Print(c)
-			fmt.Print(string('#'))
+			fmt.Print(c)
 		} else if c == rune('𠔐') {
-			// fmt.Print(string('𠔐'))
-			fmt.Print(string(' '))
+			fmt.Print(string('𠔐'))
 		} else {
-			// fmt.Print(string('𠔀'))
-			fmt.Print(string(' '))
+			fmt.Print(string('𠔀'))
 		}
 	}
 	fmt.Println()
 }
-
-// func searchAndUpdate(ts map[int][]int, size int) int {
-// 	minIdx, sizeMatched := search(ts, size)
-// 	update(ts, sizeMatched, size-sizeMatched)
-// 	return minIdx
-// }
-
-func search(ts map[int][]pair, element tuple) int {
-	minIdx := math.MaxInt
-	for i := element.size; i < 10; i++ {
-		value := ts[i]
-		if len(value) > 0 && element.idx > value[0].resultIdx && value[0].resultIdx < minIdx {
-			minIdx = value[0].emptyIdx
-		}
-	}
-
-	if minIdx == math.MaxInt {
-		fmt.Println("failed", element)
-		return -1
-	}
-	return minIdx
-}
-
-func update(ts map[int][]int, size, updatedSize int) {
-	// remove
-	if updatedSize == 0 {
-
-	}
-	// remove and add
-
-}
-
-func insert(ts map[int][]int, size, updatedSize int) {
-
-}
-
-// for removing an index
-// arr = append(arr[:indexToRemove], arr[indexToRemove+1])
-
-// for finding the index
-// index := sort.Search(len(arr), func(i int) bool { return arr[i] >= target })
-
-// 7861696610269
-// 7704727317120 too high
-// 7658461057225
-// 6327037990710
-// 6327037990710
-// 6347435485773
-// 6320029754031 too low
 
 type PairHeap []pair
 
@@ -262,5 +209,5 @@ func (h *PairHeap) Pop() any {
 	n := len(old)
 	x := old[n-1]
 	*h = old[0 : n-1]
-	return x
+	return pair(x)
 }
