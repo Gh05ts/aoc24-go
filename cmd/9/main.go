@@ -90,17 +90,15 @@ func sum(filesArray, emptyArray []int, fullFileSwap bool) int64 {
 			fileWidth := elements[i].size
 			fileID := elements[i].value
 
-			smallestIdx := math.MaxInt
 			resultIdx := math.MaxInt
 			bestWidth := -1
 			for size := fileWidth; size < 10; size++ {
 				if sizeSpaceIdx[size] != nil && sizeSpaceIdx[size].Len() > 0 && resultIdx > (*sizeSpaceIdx[size])[0].resultIdx {
-					smallestIdx = (*sizeSpaceIdx[size])[0].emptyIdx
 					resultIdx = (*sizeSpaceIdx[size])[0].resultIdx
 					bestWidth = size
 				}
 			}
-			if smallestIdx == math.MaxInt || resultIdx > elements[i].idx {
+			if resultIdx == math.MaxInt || resultIdx > elements[i].idx {
 				continue
 			}
 
