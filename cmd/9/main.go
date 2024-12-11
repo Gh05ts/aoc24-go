@@ -60,7 +60,7 @@ func atoiWrap(number string) int {
 	return num
 }
 
-func sum(filesArray, emptyArray []int, fullFileSwap bool) int64 {
+func sum(filesArray, emptyArray []int, fullFileSwap bool) int {
 	result, elements, spaces, sizeSpaceIdx := prepareInput(filesArray, emptyArray)
 
 	if !fullFileSwap {
@@ -87,32 +87,25 @@ func sum(filesArray, emptyArray []int, fullFileSwap bool) int64 {
 		}
 	} else {
 		for i := len(elements) - 1; i >= 0; i-- {
-			fileWidth := elements[i].size
-			fileID := elements[i].value
+			fileSize := elements[i].size
 
-			resultIdx := math.MaxInt
-			bestWidth := -1
-			for size := fileWidth; size < 10; size++ {
-				if sizeSpaceIdx[size] != nil && sizeSpaceIdx[size].Len() > 0 && resultIdx > (*sizeSpaceIdx[size])[0].resultIdx {
-					resultIdx = (*sizeSpaceIdx[size])[0].resultIdx
-					bestWidth = size
-				}
-			}
+			resultIdx, matchedSize := search(sizeSpaceIdx, fileSize)
 			if resultIdx == math.MaxInt || resultIdx > elements[i].idx {
 				continue
 			}
 
-			emptySpace := heap.Pop(sizeSpaceIdx[bestWidth])
-			if typed, ok := emptySpace.(pair); ok {
-				newLength := spaces[typed.emptyIdx].size - fileWidth
-				for j := 0; j < fileWidth; j++ {
+			emptySpace := heap.Pop(sizeSpaceIdx[matchedSize])
+			if space, ok := emptySpace.(pair); ok {
+				for j := 0; j < fileSize; j++ {
 					result[elements[i].idx+j] = rune('𠔀')
-					result[spaces[typed.emptyIdx].idx+j] = fileID
+					result[spaces[space.emptyIdx].idx+j] = elements[i].value
 				}
-				spaces[typed.emptyIdx].idx += fileWidth
-				spaces[typed.emptyIdx].size -= fileWidth
-				if newLength > 0 {
-					heap.Push(sizeSpaceIdx[newLength], pair{typed.resultIdx + fileWidth, typed.emptyIdx})
+
+				newEmptySize := spaces[space.emptyIdx].size - fileSize
+				spaces[space.emptyIdx].idx += fileSize
+				spaces[space.emptyIdx].size -= fileSize
+				if newEmptySize > 0 {
+					heap.Push(sizeSpaceIdx[newEmptySize], pair{space.resultIdx + fileSize, space.emptyIdx})
 				}
 			}
 		}
@@ -122,13 +115,25 @@ func sum(filesArray, emptyArray []int, fullFileSwap bool) int64 {
 	return checksum
 }
 
-func getCheckSum(result []rune) int64 {
-	var sum int64 = 0
+func search(sizeSpaceIdx map[int]*PairHeap, fileSize int) (int, int) {
+	resultIdx := math.MaxInt
+	matchedSize := math.MaxInt
+	for size := fileSize; size < 10; size++ {
+		if sizeSpaceIdx[size] != nil && sizeSpaceIdx[size].Len() > 0 && resultIdx > (*sizeSpaceIdx[size])[0].resultIdx {
+			resultIdx = (*sizeSpaceIdx[size])[0].resultIdx
+			matchedSize = size
+		}
+	}
+	return resultIdx, matchedSize
+}
+
+func getCheckSum(result []rune) int {
+	sum := 0
 	for i, char := range result {
 		if char == rune('𠔀') || char == rune('𠔐') {
 			continue
 		}
-		sum += int64(i) * int64(char)
+		sum += i * int(char)
 	}
 	return sum
 }
