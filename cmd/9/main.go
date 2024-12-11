@@ -61,51 +61,51 @@ func atoiWrap(number string) int {
 }
 
 func sum(filesArray, emptyArray []int, fullFileSwap bool) int {
-	result, elements, spaces, sizeSpaceIdx := prepareInput(filesArray, emptyArray)
+	result, files, spaces, spaceSizedLocation := prepareInput(filesArray, emptyArray)
 
 	if !fullFileSwap {
-		lastElementIdx := len(elements) - 1
-		lastElement := elements[lastElementIdx]
+		lastElementIdx := len(files) - 1
+		lastFile := files[lastElementIdx]
 		breakAll := false
 		for _, spaceTuple := range spaces {
 			for i := 0; i < spaceTuple.size; i++ {
-				if lastElement.size == 0 {
+				if lastFile.size == 0 {
 					lastElementIdx--
-					lastElement = elements[lastElementIdx]
+					lastFile = files[lastElementIdx]
 				}
-				if spaceTuple.idx+i > lastElement.idx+lastElement.size-1 {
+				if spaceTuple.idx+i > lastFile.idx+lastFile.size-1 {
 					breakAll = true
 					break
 				}
-				result[spaceTuple.idx+i] = lastElement.value
-				result[lastElement.idx+lastElement.size-1] = rune('𠔀')
-				lastElement.size -= 1
+				result[spaceTuple.idx+i] = lastFile.value
+				result[lastFile.idx+lastFile.size-1] = rune('𠔀')
+				lastFile.size -= 1
 			}
 			if breakAll {
 				break
 			}
 		}
 	} else {
-		for i := len(elements) - 1; i >= 0; i-- {
-			fileSize := elements[i].size
+		for i := len(files) - 1; i >= 0; i-- {
+			fileSize := files[i].size
 
-			resultIdx, matchedSize := search(sizeSpaceIdx, fileSize)
-			if resultIdx == math.MaxInt || resultIdx > elements[i].idx {
+			resultIdx, matchedSize := search(spaceSizedLocation, fileSize)
+			if resultIdx == math.MaxInt || resultIdx > files[i].idx {
 				continue
 			}
 
-			emptySpace := heap.Pop(sizeSpaceIdx[matchedSize])
+			emptySpace := heap.Pop(spaceSizedLocation[matchedSize])
 			if space, ok := emptySpace.(pair); ok {
 				for j := 0; j < fileSize; j++ {
-					result[elements[i].idx+j] = rune('𠔀')
-					result[spaces[space.emptyIdx].idx+j] = elements[i].value
+					result[files[i].idx+j] = rune('𠔀')
+					result[spaces[space.emptyIdx].idx+j] = files[i].value
 				}
 
 				newEmptySize := spaces[space.emptyIdx].size - fileSize
 				spaces[space.emptyIdx].idx += fileSize
 				spaces[space.emptyIdx].size -= fileSize
 				if newEmptySize > 0 {
-					heap.Push(sizeSpaceIdx[newEmptySize], pair{space.resultIdx + fileSize, space.emptyIdx})
+					heap.Push(spaceSizedLocation[newEmptySize], pair{space.resultIdx + fileSize, space.emptyIdx})
 				}
 			}
 		}
@@ -115,12 +115,12 @@ func sum(filesArray, emptyArray []int, fullFileSwap bool) int {
 	return checksum
 }
 
-func search(sizeSpaceIdx map[int]*PairHeap, fileSize int) (int, int) {
+func search(spaceSizedLocation map[int]*PairHeap, fileSize int) (int, int) {
 	resultIdx := math.MaxInt
 	matchedSize := math.MaxInt
 	for size := fileSize; size < 10; size++ {
-		if sizeSpaceIdx[size] != nil && sizeSpaceIdx[size].Len() > 0 && resultIdx > (*sizeSpaceIdx[size])[0].resultIdx {
-			resultIdx = (*sizeSpaceIdx[size])[0].resultIdx
+		if spaceSizedLocation[size] != nil && spaceSizedLocation[size].Len() > 0 && resultIdx > (*spaceSizedLocation[size])[0].resultIdx {
+			resultIdx = (*spaceSizedLocation[size])[0].resultIdx
 			matchedSize = size
 		}
 	}
@@ -138,33 +138,33 @@ func getCheckSum(result []rune) int {
 	return sum
 }
 
-func prepareInput(filesArray, emptyArray []int) (final []rune, elements, spaces []tuple, emptySizeSort map[int]*PairHeap) {
-	result := []rune{}
-	elementsIdxSize, emptyIdxSize := []tuple{}, []tuple{}
-	emptySizeSortIdx := make(map[int]*PairHeap)
+func prepareInput(filesArray, emptyArray []int) (result []rune, files, spaces []tuple, emptySizeSort map[int]*PairHeap) {
+	resultSlice := []rune{}
+	filesSlice, spaceSlice := []tuple{}, []tuple{}
+	spaceSizedLocation := make(map[int]*PairHeap)
 
 	startEmptyIdx, endEmptyIdx := 0, len(emptyArray)-1
 	for i := 0; i < len(filesArray); i++ {
-		elementIdxSize := int(filesArray[i])
-		elementsIdxSize = append(elementsIdxSize, tuple{len(result), elementIdxSize, rune(i)})
-		fill(&result, rune(i), elementIdxSize)
+		fileSize := int(filesArray[i])
+		filesSlice = append(filesSlice, tuple{len(resultSlice), fileSize, rune(i)})
+		fill(&resultSlice, rune(i), fileSize)
 
 		if startEmptyIdx <= endEmptyIdx {
-			emptySpaceIdx := len(result)
-			emptySpaceSize := int(emptyArray[startEmptyIdx])
-			if emptySpaceSize > 0 {
-				if _, found := emptySizeSortIdx[emptySpaceSize]; !found {
-					emptySizeSortIdx[emptySpaceSize] = &PairHeap{}
-					heap.Init(emptySizeSortIdx[emptySpaceSize])
+			resultSpaceIdx := len(resultSlice)
+			spaceSize := int(emptyArray[startEmptyIdx])
+			if spaceSize > 0 {
+				if _, found := spaceSizedLocation[spaceSize]; !found {
+					spaceSizedLocation[spaceSize] = &PairHeap{}
+					heap.Init(spaceSizedLocation[spaceSize])
 				}
-				heap.Push(emptySizeSortIdx[emptySpaceSize], pair{emptySpaceIdx, len(emptyIdxSize)})
-				emptyIdxSize = append(emptyIdxSize, tuple{emptySpaceIdx, emptySpaceSize, rune('𠔐')})
+				heap.Push(spaceSizedLocation[spaceSize], pair{resultSpaceIdx, len(spaceSlice)})
+				spaceSlice = append(spaceSlice, tuple{resultSpaceIdx, spaceSize, rune('𠔐')})
 			}
-			fill(&result, rune('𠔐'), emptySpaceSize)
+			fill(&resultSlice, rune('𠔐'), spaceSize)
 			startEmptyIdx++
 		}
 	}
-	return result, elementsIdxSize, emptyIdxSize, emptySizeSortIdx
+	return resultSlice, filesSlice, spaceSlice, spaceSizedLocation
 }
 
 func fill(arr *[]rune, val rune, times int) {
