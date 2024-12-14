@@ -102,15 +102,15 @@ func findScore(grid [][]int, startLocations []pair, flag bool) int {
 	return count
 }
 
-func dfs(grid [][]int, i, j, length, breadth int, startLocation pair, finalLocations map[pair]int, startEnd map[pair]bool, v2 bool) {
+func dfs(grid [][]int, i, j, length, breadth int, startLocation pair, finalLocations map[pair]int, startEnd map[pair]bool, addUniquePaths bool) {
 	if grid[i][j] == 9 {
-		didUpdate := false
+		addCount := true
 		if _, found := startEnd[pair{i, j}]; !found {
 			startEnd[pair{i, j}] = true
 			finalLocations[pair{i, j}]++
-			didUpdate = true
+			addCount = false
 		}
-		if v2 && !didUpdate {
+		if addUniquePaths && addCount {
 			finalLocations[pair{i, j}]++
 		}
 	}
@@ -119,7 +119,7 @@ func dfs(grid [][]int, i, j, length, breadth int, startLocation pair, finalLocat
 	for _, dir := range directions {
 		ni, nj := i+dir[0], j+dir[1]
 		if ni >= 0 && ni < length && nj >= 0 && nj < breadth && grid[ni][nj] == grid[i][j]+1 {
-			dfs(grid, ni, nj, length, breadth, startLocation, finalLocations, startEnd, v2)
+			dfs(grid, ni, nj, length, breadth, startLocation, finalLocations, startEnd, addUniquePaths)
 		}
 	}
 }
