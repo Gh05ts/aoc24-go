@@ -7,6 +7,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"golang.org/x/exp/maps"
 )
 
 type bufioCloser struct {
@@ -25,7 +27,8 @@ func main() {
 	defer reader.Close()
 
 	grid, startLocations := ioConvert(reader)
-	count := findScore(grid, startLocations)
+	flag := strings.Compare(args[1], "v2") == 0
+	count := findScore(grid, startLocations, flag)
 	fmt.Println(count)
 	// printGrid(grid)
 	// printStartLocations(startLocations)
@@ -82,32 +85,41 @@ func atoiWrap(number string) int {
 	return num
 }
 
-func findScore(grid [][]int, startLocations []pair) int {
+func findScore(grid [][]int, startLocations []pair, flag bool) int {
 	count := 0
-	hashMap := make(map[pair]int)
-	startEnd := make(map[pair]map[pair]bool)
+	finalLocations := make(map[pair]int)
+	startEnd := make(map[pair]bool)
 
 	LenLimit := len(grid)
 	BreadthLimit := len(grid[0])
 	for _, startLocation := range startLocations {
-		dfs(grid, startLocation.x, startLocation.y, LenLimit, BreadthLimit, startLocation, hashMap, startEnd)
+		dfs(grid, startLocation.x, startLocation.y, LenLimit, BreadthLimit, startLocation, finalLocations, startEnd, flag)
+		maps.Clear(startEnd)
 	}
-	for _, v := range hashMap {
+	for _, v := range finalLocations {
 		count += v
 	}
 	return count
 }
 
-func dfs(grid [][]int, i, j, length, breadth int, startLocation pair, finalLocations map[pair]int, startEnd map[pair]map[pair]bool) {
+func dfs(grid [][]int, i, j, length, breadth int, startLocation pair, finalLocations map[pair]int, startEnd map[pair]bool, v2 bool) {
 	if grid[i][j] == 9 {
-		finalLocations[pair{i, j}]++
+		didUpdate := false
+		if _, found := startEnd[pair{i, j}]; !found {
+			startEnd[pair{i, j}] = true
+			finalLocations[pair{i, j}]++
+			didUpdate = true
+		}
+		if v2 && !didUpdate {
+			finalLocations[pair{i, j}]++
+		}
 	}
 
 	directions := [4][2]int{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}
 	for _, dir := range directions {
 		ni, nj := i+dir[0], j+dir[1]
 		if ni >= 0 && ni < length && nj >= 0 && nj < breadth && grid[ni][nj] == grid[i][j]+1 {
-			dfs(grid, ni, nj, length, breadth, startLocation, finalLocations, startEnd)
+			dfs(grid, ni, nj, length, breadth, startLocation, finalLocations, startEnd, v2)
 		}
 	}
 }
