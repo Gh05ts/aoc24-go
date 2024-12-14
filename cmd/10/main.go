@@ -30,9 +30,6 @@ func main() {
 	flag := strings.Compare(args[1], "v2") == 0
 	count := findScore(grid, startLocations, flag)
 	fmt.Println(count)
-	// printGrid(grid)
-	// printStartLocations(startLocations)
-	// fmt.Println(grid)
 }
 
 func fileReader(path string) *bufioCloser {
