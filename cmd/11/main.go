@@ -5,6 +5,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func main() {
@@ -56,8 +57,12 @@ func countStones(stones []int64, bigger bool) int64 {
 	} else {
 		limit = 25
 	}
+	start := time.Now()
 	for i := 0; i < limit; i++ {
 		for k, v := range freqMap {
+			if v == 0 {
+				continue
+			}
 			strVal := strconv.FormatInt(k, 10)
 			lenStrVal := len(strVal)
 			copyFreqMap[k] -= v
@@ -76,10 +81,11 @@ func countStones(stones []int64, bigger bool) int64 {
 			freqMap[key] = value
 		}
 	}
-
 	count := int64(0)
 	for _, value := range copyFreqMap {
 		count += value
 	}
+	end := time.Now()
+	fmt.Println("time taken:", end.Sub(start))
 	return count
 }
