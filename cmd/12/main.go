@@ -91,6 +91,19 @@ func totalPrice(grid [][]rune, discount bool) int {
 	return price
 }
 
+func dfs(grid [][]rune, i, j, length, breadth int, groups *[]pair, visited map[pair]bool) {
+	visited[pair{i, j}] = true
+	*groups = append(*groups, pair{i, j})
+
+	directions := [4][2]int{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}
+	for _, dir := range directions {
+		ni, nj := i+dir[0], j+dir[1]
+		if ni >= 0 && ni < length && nj >= 0 && nj < breadth && grid[ni][nj] == grid[i][j] && !visited[pair{ni, nj}] {
+			dfs(grid, ni, nj, length, breadth, groups, visited)
+		}
+	}
+}
+
 func getPerimeter(grid [][]rune, val pair, lenLimit, breadthLimit int) int {
 	perimeter := 0
 	fourDirections := [4][2]int{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}
@@ -156,19 +169,6 @@ func search(haystack []pair, needle pair) bool {
 		}
 	}
 	return false
-}
-
-func dfs(grid [][]rune, i, j, length, breadth int, groups *[]pair, visited map[pair]bool) {
-	visited[pair{i, j}] = true
-	*groups = append(*groups, pair{i, j})
-
-	directions := [4][2]int{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}
-	for _, dir := range directions {
-		ni, nj := i+dir[0], j+dir[1]
-		if ni >= 0 && ni < length && nj >= 0 && nj < breadth && grid[ni][nj] == grid[i][j] && !visited[pair{ni, nj}] {
-			dfs(grid, ni, nj, length, breadth, groups, visited)
-		}
-	}
 }
 
 // func printGrid(grid [][]rune) {
