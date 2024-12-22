@@ -73,21 +73,11 @@ func totalPrice(grid [][]rune, discount bool) int {
 		}
 	}
 
-	fourDirections := [4][2]int{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}
 	for i := range groups {
 		perimeter := 0
 		corners := 0
 		for _, val := range groups[i] {
-			curChar := grid[val.x][val.y]
-			for _, direction := range fourDirections {
-				ni, nj := val.x+direction[0], val.y+direction[1]
-				if ni >= 0 && ni < LenLimit && nj >= 0 && nj < BreadthLimit && grid[ni][nj] != curChar {
-					perimeter += 1
-				} else if ni < 0 || nj < 0 || ni == LenLimit || nj == BreadthLimit {
-					perimeter += 1
-				}
-			}
-
+			perimeter += getPerimeter(grid, val, LenLimit, BreadthLimit)
 			corners += countCorners(groups[i], val)
 		}
 		// fmt.Println("i: ", i, "area:", len(groups[i]), "perimeter:", perimeter, "corners:", corners)
@@ -99,6 +89,21 @@ func totalPrice(grid [][]rune, discount bool) int {
 	}
 
 	return price
+}
+
+func getPerimeter(grid [][]rune, val pair, LenLimit, BreadthLimit int) int {
+	perimeter := 0
+	fourDirections := [4][2]int{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}
+	curChar := grid[val.x][val.y]
+	for _, direction := range fourDirections {
+		ni, nj := val.x+direction[0], val.y+direction[1]
+		if ni >= 0 && ni < LenLimit && nj >= 0 && nj < BreadthLimit && grid[ni][nj] != curChar {
+			perimeter += 1
+		} else if ni < 0 || nj < 0 || ni == LenLimit || nj == BreadthLimit {
+			perimeter += 1
+		}
+	}
+	return perimeter
 }
 
 func countCorners(group []pair, cur pair) int {
