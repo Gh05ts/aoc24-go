@@ -77,8 +77,11 @@ func totalPrice(grid [][]rune, discount bool) int {
 		perimeter := 0
 		corners := 0
 		for _, val := range groups[i] {
-			perimeter += getPerimeter(grid, val, lenLimit, breadthLimit)
-			corners += countCorners(groups[i], val)
+			if discount {
+				corners += countCorners(groups[i], val)
+			} else {
+				perimeter += getPerimeter(grid, val, lenLimit, breadthLimit)
+			}
 		}
 		// fmt.Println("i: ", i, "area:", len(groups[i]), "perimeter:", perimeter, "corners:", corners)
 		if discount {
