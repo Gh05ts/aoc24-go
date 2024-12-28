@@ -25,8 +25,7 @@ func main() {
 
 	flag := strings.Compare(args[1], "v2") == 0
 	buttonPrize := ioConvert(reader, flag)
-	// fmt.Println(buttonPrize)
-	// fmt.Println(flag)
+
 	tokens := fewestTokens(buttonPrize)
 	fmt.Println(tokens)
 }
