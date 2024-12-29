@@ -100,6 +100,7 @@ func findTree(io []pair) int {
 			py := ((val.y+i*val.vy)%height + height) % height
 			positions[px][py] = 'X'
 		}
+
 		count := 0
 		for i := range positions {
 			for j := range positions[i] {
@@ -108,6 +109,7 @@ func findTree(io []pair) int {
 				}
 			}
 		}
+
 		if count > 40 {
 			printGrid(positions)
 			return turn

@@ -23,13 +23,11 @@ func main() {
 	reader := fileReader("inputs/15.txt")
 	defer reader.Close()
 
-	fmt.Println(string('^'))
-
 	grid, ops := ioConvert(reader)
-	startLocation, boxes, walls := prepareInput(grid)
+	startLocation, _, _ := prepareInput(grid)
 
 	flag := strings.Compare(args[1], "v2") == 0
-	sum := getSum(grid, ops, startLocation, boxes, walls, flag)
+	sum := getSum(grid, ops, startLocation, flag)
 	fmt.Println(sum)
 }
 
@@ -89,8 +87,48 @@ func prepareInput(grid [][]rune) (startLoc pair, boxes, walls []pair) {
 	return startLocation, boxSlice, wallsSlice
 }
 
-func getSum(grid [][]rune, ops []rune, startLocation pair, boxes, walls []pair, stage2 bool) int {
+func getSum(grid [][]rune, ops []rune, startLocation pair, stage2 bool) int {
 	count := 0
+	dirs := map[rune]pair{rune('<'): {0, -1}, rune('>'): {0, 1}, rune('^'): {-1, 0}, rune('v'): {1, 0}}
+	for _, char := range ops {
+		dir := dirs[char]
+		boxs := []pair{}
+		move := false
+		tracker := startLocation
+		for {
+			tracker.x += dir.x
+			tracker.y += dir.y
+			if grid[tracker.x][tracker.y] == rune('#') {
+				break
+			}
+			if grid[tracker.x][tracker.y] == rune('.') {
+				move = true
+				break
+			}
+			if grid[tracker.x][tracker.y] == rune('O') {
+				boxs = append(boxs, tracker)
+			}
+		}
+		if move {
+			grid[startLocation.x][startLocation.y] = '.'
+			startLocation.x += dir.x
+			startLocation.y += dir.y
+			for _, location := range boxs {
+				grid[location.x][location.y] = rune('.')
+			}
+			for _, location := range boxs {
+				grid[location.x+dir.x][location.y+dir.y] = rune('O')
+			}
+			grid[startLocation.x][startLocation.y] = '@'
+		}
+	}
+	for i := range grid {
+		for j := range grid {
+			if grid[i][j] == rune('O') {
+				count += 100*i + j
+			}
+		}
+	}
 	return count
 }
 
