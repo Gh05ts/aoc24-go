@@ -26,13 +26,13 @@ func main() {
 	grid, ops := ioConvert(reader)
 	startLocation, _, _ := prepareInput(grid)
 
-	flag := strings.Compare(args[1], "v2") == 0
-	if flag {
-		sum := getSum(grid, ops, startLocation)
-		fmt.Println(sum)
-	} else {
+	stage2 := strings.Compare(args[1], "v2") == 0
+	if stage2 {
 		// sum := getSum(grid, ops, startLocation)
 		// fmt.Println(sum)
+	} else {
+		sum := getSum(grid, ops, startLocation)
+		fmt.Println(sum)
 	}
 }
 
