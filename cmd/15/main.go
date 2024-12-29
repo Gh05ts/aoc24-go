@@ -93,25 +93,25 @@ func prepareInput(grid [][]rune) (startLoc pair, boxes, walls []pair) {
 }
 
 func getSum(grid [][]rune, ops []rune, startLocation pair) int {
-	count := 0
+	sum := 0
 	dirs := map[rune]pair{rune('<'): {0, -1}, rune('>'): {0, 1}, rune('^'): {-1, 0}, rune('v'): {1, 0}}
 	for _, char := range ops {
 		dir := dirs[char]
-		boxs := []pair{}
+		boxes := []pair{}
 		move := false
-		tracker := startLocation
+		crawler := startLocation
 		for {
-			tracker.x += dir.x
-			tracker.y += dir.y
-			if grid[tracker.x][tracker.y] == rune('#') {
+			crawler.x += dir.x
+			crawler.y += dir.y
+			if grid[crawler.x][crawler.y] == rune('#') {
 				break
 			}
-			if grid[tracker.x][tracker.y] == rune('.') {
+			if grid[crawler.x][crawler.y] == rune('.') {
 				move = true
 				break
 			}
-			if grid[tracker.x][tracker.y] == rune('O') {
-				boxs = append(boxs, tracker)
+			if grid[crawler.x][crawler.y] == rune('O') {
+				boxes = append(boxes, crawler)
 			}
 		}
 
@@ -119,10 +119,10 @@ func getSum(grid [][]rune, ops []rune, startLocation pair) int {
 			grid[startLocation.x][startLocation.y] = '.'
 			startLocation.x += dir.x
 			startLocation.y += dir.y
-			for _, location := range boxs {
+			for _, location := range boxes {
 				grid[location.x][location.y] = rune('.')
 			}
-			for _, location := range boxs {
+			for _, location := range boxes {
 				grid[location.x+dir.x][location.y+dir.y] = rune('O')
 			}
 			grid[startLocation.x][startLocation.y] = '@'
@@ -132,11 +132,11 @@ func getSum(grid [][]rune, ops []rune, startLocation pair) int {
 	for i := range grid {
 		for j := range grid {
 			if grid[i][j] == rune('O') {
-				count += 100*i + j
+				sum += 100*i + j
 			}
 		}
 	}
-	return count
+	return sum
 }
 
 // func opPrinter(ops []rune) {
