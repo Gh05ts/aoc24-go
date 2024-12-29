@@ -27,8 +27,13 @@ func main() {
 	startLocation, _, _ := prepareInput(grid)
 
 	flag := strings.Compare(args[1], "v2") == 0
-	sum := getSum(grid, ops, startLocation, flag)
-	fmt.Println(sum)
+	if flag {
+		sum := getSum(grid, ops, startLocation)
+		fmt.Println(sum)
+	} else {
+		// sum := getSum(grid, ops, startLocation)
+		// fmt.Println(sum)
+	}
 }
 
 func fileReader(path string) *bufioCloser {
@@ -87,7 +92,7 @@ func prepareInput(grid [][]rune) (startLoc pair, boxes, walls []pair) {
 	return startLocation, boxSlice, wallsSlice
 }
 
-func getSum(grid [][]rune, ops []rune, startLocation pair, stage2 bool) int {
+func getSum(grid [][]rune, ops []rune, startLocation pair) int {
 	count := 0
 	dirs := map[rune]pair{rune('<'): {0, -1}, rune('>'): {0, 1}, rune('^'): {-1, 0}, rune('v'): {1, 0}}
 	for _, char := range ops {
@@ -109,6 +114,7 @@ func getSum(grid [][]rune, ops []rune, startLocation pair, stage2 bool) int {
 				boxs = append(boxs, tracker)
 			}
 		}
+
 		if move {
 			grid[startLocation.x][startLocation.y] = '.'
 			startLocation.x += dir.x
@@ -122,6 +128,7 @@ func getSum(grid [][]rune, ops []rune, startLocation pair, stage2 bool) int {
 			grid[startLocation.x][startLocation.y] = '@'
 		}
 	}
+
 	for i := range grid {
 		for j := range grid {
 			if grid[i][j] == rune('O') {
